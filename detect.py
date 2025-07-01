@@ -5,8 +5,6 @@ import os
 app = Flask(__name__)
 model = YOLO("yolov8n.pt")
 
-
-
 @app.route('/detect', methods=['POST'])
 def detect():
     try:
