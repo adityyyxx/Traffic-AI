@@ -7,8 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     $uploadPath = 'uploads/' . $fileName;
 
     if (move_uploaded_file($fileTmp, $uploadPath)) {
-        $apiUrl = 'https://traffic-ai-api.onrender.com/detect';
-
+        $apiUrl = 'http://localhost:5000/detect';
 
 
         $cfile = new CURLFile($uploadPath);
