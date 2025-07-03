@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: traffic-ai-api
-    env: python
-    buildCommand: ""
-    startCommand: python detect.py
-    runtime: python
-    region: oregon
