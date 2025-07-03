@@ -1,9 +1,8 @@
 services:
   - type: web
-    name: traffic-ai-backend
+    name: traffic-ai-api
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: ""
     startCommand: python detect.py
-    envVars:
-      - key: FLASK_ENV
-        value: production
+    runtime: python
+    region: oregon
