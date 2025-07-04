@@ -1,6 +1,6 @@
 The **Traffic Violation Detection System** is a locally hosted full-stack project that detects traffic violations (like no helmet) using **YOLOv8**. To run it locally, follow these steps:
 
-#**Add trafic viloation folder and it sub folders fronted and backend and perform these steps**
+**Add trafic viloation folder and it sub folders fronted and backend and perform these steps**
 
 1. **Backend Setup**:
    open command prompt
