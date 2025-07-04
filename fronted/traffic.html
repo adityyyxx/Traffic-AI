@@ -124,29 +124,4 @@
     formData.append("file", file);
 
     try {
-      const response = await fetch("/detect", {
-        method: "POST",
-        body: formData
-      });
-
-      const text = await response.text();
-      resultText.innerText = text;
-      resultText.style.display = "block";
-      resultText.className = response.ok ? "alert alert-success text-center" : "alert alert-danger text-center";
-
-    } catch (error) {
-      resultText.innerText = "❌ Error: " + error.message;
-      resultText.className = "alert alert-danger text-center";
-      resultText.style.display = "block";
-    } finally {
-      loading.style.display = "none";
-    }
-  });
-
-  function triggerFileUpload() {
-    document.getElementById("fileInput").click();
-  }
-</script>
-
-</body>
-</html>
+      const response =

@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: traffic-ai
-    env: docker
-    plan: free
-    region: oregon
-    dockerfilePath: Dockerfile
-    autoDeploy: true
