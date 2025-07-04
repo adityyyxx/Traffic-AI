@@ -1,21 +1,21 @@
 from flask import Flask, request
-import requests
+from flask_cors import CORS
+from ultralytics import YOLO
 import os
 
 app = Flask(__name__)
+CORS(app)
+
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# 🔐 Ultralytics API Details
-API_KEY = "f454997160ead091409c1b30c32a229ca260105d9e"
-API_URL = "https://api.ultralytics.com/v1/predict"
-
-
+# 🧠 Load your trained YOLO model (replace with your model path or use yolov8n.pt for testing)
+MODEL_PATH = "yolov8n.pt"  # Replace with your custom model if needed
+model = YOLO(MODEL_PATH)
 
 @app.route('/detect', methods=['POST'])
 def detect():
     try:
-        # Handle uploaded file
         file = request.files.get('file')
         if not file:
             return "❗ No file provided in request.", 400
@@ -24,32 +24,24 @@ def detect():
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
 
-        # Send to Ultralytics API
-        with open(filepath, "rb") as f:
-            files = {"image": f}
-            headers = {"Authorization": f"Bearer {API_KEY}"}
-            response = requests.post(API_URL, files=files, headers=headers)
+        # 🔍 Perform detection using YOLOv8
+        results = model(filepath)
+        names = model.names
 
-        # Handle API Response
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("success"):
-                detections = data.get("data", {}).get("results", [])
-                detected_classes = [obj["name"] for obj in detections]
+        detected_classes = set()
+        for r in results:
+            for box in r.boxes:
+                cls_id = int(box.cls[0])
+                detected_classes.add(names[cls_id])
 
-                if detected_classes:
-                    return "✅ Detected objects:\n" + "\n".join(set(detected_classes))
-                else:
-                    return "✅ No violations detected."
-            else:
-                return f"❌ Ultralytics API Error: {data.get('message', 'Unknown error')}", 500
+        if detected_classes:
+            return "✅ Detected objects:\n" + "\n".join(detected_classes)
         else:
-            return f"❌ HTTP Error {response.status_code}: {response.text}", 500
+            return "✅ No violations detected."
 
     except Exception as e:
         return f"❌ Internal Server Error: {e}", 500
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT") or 8080)
-app.run(host='0.0.0.0', port=port, debug=False)
-
+    app.run(host='0.0.0.0', port=port, debug=False)

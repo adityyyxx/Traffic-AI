@@ -7,9 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     $uploadPath = 'uploads/' . $fileName;
 
     if (move_uploaded_file($fileTmp, $uploadPath)) {
-      $apiUrl = 'https://traffic-backend-34sl.onrender.com/detect';
-
-
+        // ✅ Change this URL to local Flask server
+        $apiUrl = 'http://127.0.0.1:8080/detect';  // or use your local IP
 
         $cfile = new CURLFile($uploadPath);
         $postData = ['file' => $cfile];
