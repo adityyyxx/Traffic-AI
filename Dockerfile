@@ -1,9 +1,10 @@
-# Base image with Python
+# Base image
 FROM python:3.10-slim
 
+# Silence interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install PHP and Apache
+# Install Apache, PHP, and system tools
 RUN apt-get update && \
     apt-get install -y apache2 php libapache2-mod-php curl && \
     apt-get clean
@@ -11,17 +12,17 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /app
 
-# Copy all project files
+# Copy project files
 COPY . /app
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Link PHP frontend to Apache
-RUN ln -s /app/public /var/www/html
+# Remove Apache warning
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Expose port (Render will override this)
-EXPOSE 8080
+# Link public folder (if using it)
+RUN ln -s /app/public /var/www/html || true
 
-# Start Apache and Flask API using a startup script
-CMD service apache2 start && python3 app.py
+# Start both Apache (PHP) and Flask (detect.py)
+CMD service apache2 start && python3 detect.py
