@@ -4,10 +4,6 @@ import os
 
 app = Flask(__name__)
 
-# 🔽 Load YOLOv8 model (make sure this file exists in your project root
-model = YOLO("yolov8n")  # or "yolov8n"
-
-
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -17,11 +13,13 @@ def detect():
         file = request.files['file']
         filename = os.path.basename(file.filename)
         filepath = os.path.join(UPLOAD_FOLDER, filename)
-
-        # Save file in case not already saved by PHP (Railway use-case)
         file.save(filepath)
 
         print(f"[INFO] Detecting on: {filepath}")
+
+        # 🔽 Load model only when needed (saves memory!)
+        model = YOLO("yolov8n")
+
         results = model(filepath)
         names = results[0].names
         classes = results[0].boxes.cls.tolist()
@@ -36,5 +34,5 @@ def detect():
         return f"❌ Error: {e}"
 
 if __name__ == '__main__':
-    # ✅ Required for Railway deployment (bind to all IPs)
+    # ✅ Important for deployment platforms like Railway or Render
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=False)
