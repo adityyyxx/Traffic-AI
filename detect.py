@@ -4,8 +4,9 @@ import os
 
 app = Flask(__name__)
 
-# 🔽 Load YOLOv8 model (make sure this file exists in your project root)
-model = YOLO("yolov8n.pt")
+# 🔽 Load YOLOv8 model (make sure this file exists in your project root
+model = YOLO("yolov8n.yaml")  # or "yolov8n"
+
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
