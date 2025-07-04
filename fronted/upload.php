@@ -1,48 +1,59 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["file"])) {
-    $fileTmpPath = $_FILES["file"]["tmp_name"];
-    $fileName = basename($_FILES["file"]["name"]);
+$result = "";
 
-    $cfile = new CURLFile($fileTmpPath, $_FILES["file"]["type"], $fileName);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
+    $fileTmp = $_FILES['image']['tmp_name'];
+    $fileName = basename($_FILES['image']['name']);
+    $uploadPath = 'uploads/' . $fileName;
 
-    $curl = curl_init();
-    curl_setopt_array($curl, [
-        CURLOPT_URL => "http://127.0.0.1:8080/detect", // 👈 Local Flask endpoint
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => ['file' => $cfile],
-    ]);
+    if (move_uploaded_file($fileTmp, $uploadPath)) {
+        // ✅ Change this URL to local Flask server
+        $apiUrl = 'http://127.0.0.1:8080/detect';  // or use your local IP
 
-    $response = curl_exec($curl);
-    $error = curl_error($curl);
-    curl_close($curl);
+        $cfile = new CURLFile($uploadPath);
+        $postData = ['file' => $cfile];
 
-    if ($error) {
-        $result = "❌ CURL Error: $error";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $apiUrl);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            $error_msg = curl_error($ch);
+            $result = "❌ cURL Error: $error_msg";
+        } elseif (!$response) {
+            $result = "⚠️ No response received from Flask server.";
+        } else {
+            $result = $response;
+        }
+
+        curl_close($ch);
     } else {
-        $result = $response;
+        $result = "❌ Failed to upload file.";
     }
+} else {
+    $result = "❗ No file uploaded.";
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Traffic Violation Detection (PHP)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Detection Result</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
 </head>
 <body>
-    <h2>🚦 Upload Image to Detect Violations (PHP version)</h2>
-
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" required>
-        <button type="submit">Upload</button>
-    </form>
-
-    <?php if (!empty($result)): ?>
-        <div style="margin-top:20px; padding:10px; border:1px solid #ccc;">
-            <strong>Result:</strong><br>
-            <pre><?= htmlspecialchars($result) ?></pre>
-        </div>
-    <?php endif; ?>
+  <div class="container mt-5">
+    <h3>📋 Detection Results:</h3>
+    <div class="alert alert-info">
+      <pre><?php echo htmlspecialchars($result); ?></pre>
+    </div>
+    <a href="traffic.html" class="btn btn-secondary">⬅️ Back to Upload</a>
+  </div>
 </body>
 </html>
