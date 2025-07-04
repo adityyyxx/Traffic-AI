@@ -15,7 +15,7 @@ def detect():
         filename = os.path.basename(file.filename)  # ✅ This ensures no path included
         filepath = os.path.join(UPLOAD_FOLDER, filename)
 
-        file.save(filepath)
+        file.save(filepath)hvvvv
         print(f"[INFO] File saved: {filepath}")
 
         results = model(filepath)
