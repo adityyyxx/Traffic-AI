@@ -1,0 +1,10 @@
+FROM php:8.2-apache
+
+# Enable Apache mod_rewrite if needed
+RUN a2enmod rewrite
+
+# Copy your frontend code to the web root
+COPY . /var/www/html/
+
+# Expose port 80 for Render
+EXPOSE 80
