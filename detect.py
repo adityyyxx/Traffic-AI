@@ -53,5 +53,6 @@ def detect():
         return f"❌ Internal Server Error: {e}", 500
 
 if __name__ == '__main__':
-    # Railway expects port from $PORT
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=False)
+    port = int(os.environ.get("PORT") or 8080)
+app.run(host='0.0.0.0', port=port, debug=False)
+
