@@ -1,10 +1,9 @@
-# Base image with Python and system packages
+# Base image with Python
 FROM python:3.10-slim
 
-# Set environment variables to avoid interactive prompts during install
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install Apache, PHP, and required tools
+# Install PHP and Apache
 RUN apt-get update && \
     apt-get install -y apache2 php libapache2-mod-php curl && \
     apt-get clean
@@ -12,17 +11,17 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /app
 
-# Copy project files
+# Copy all project files
 COPY . /app
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Link PHP app to Apache root
+# Link PHP frontend to Apache
 RUN ln -s /app/public /var/www/html
 
-# Expose port (optional if using Render)
+# Expose port (Render will override this)
 EXPOSE 8080
 
-# Start both Apache and Flask using a script
+# Start Apache and Flask API using a startup script
 CMD service apache2 start && python3 app.py

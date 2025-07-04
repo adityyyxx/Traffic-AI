@@ -7,9 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     $uploadPath = 'uploads/' . $fileName;
 
     if (move_uploaded_file($fileTmp, $uploadPath)) {
-      $apiUrl = 'https://traffic-ai-production.up.railway.app/detect';
-
-
+      $apiUrl = 'http://localhost:8080/detect';
 
         $cfile = new CURLFile($uploadPath);
         $postData = ['file' => $cfile];
