@@ -10,10 +10,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 API_KEY = "f454997160ead091409c1b30c32a229ca260105d9e"
 API_URL = "https://api.ultralytics.com/v1/predict"
 
-# ✅ Home route (optional, prevents 404 at root URL)
-@app.route('/')
-def home():
-    return "✅ Traffic Violation Detection Flask API is running. Use POST /detect to analyze images."
+
 
 @app.route('/detect', methods=['POST'])
 def detect():
