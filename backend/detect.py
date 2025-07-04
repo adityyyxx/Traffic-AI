@@ -1,55 +1,36 @@
 from flask import Flask, request
-import requests
+from ultralytics import YOLO
 import os
 
 app = Flask(__name__)
+model = YOLO("yolov8n.pt")
+
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# 🔐 Ultralytics API Details
-API_KEY = "f454997160ead091409c1b30c32a229ca260105d9e"
-API_URL = "https://api.ultralytics.com/v1/predict"
-
-
-
-@app.route('/detect', methods=['POST'])
+@app.route('/detect', methods=['POST'])  # ✅ no changes to this line required
 def detect():
     try:
-        # Handle uploaded file
-        file = request.files.get('file')
-        if not file:
-            return "❗ No file provided in request.", 400
-
-        filename = os.path.basename(file.filename)
+        file = request.files['file']
+        filename = os.path.basename(file.filename)  # ✅ This ensures no path included
         filepath = os.path.join(UPLOAD_FOLDER, filename)
+
         file.save(filepath)
+        print(f"[INFO] File saved: {filepath}")
 
-        # Send to Ultralytics API
-        with open(filepath, "rb") as f:
-            files = {"image": f}
-            headers = {"Authorization": f"Bearer {API_KEY}"}
-            response = requests.post(API_URL, files=files, headers=headers)
+        results = model(filepath)
+        names = results[0].names
+        classes = results[0].boxes.cls.tolist()
+        detected = [names[int(cls)] for cls in classes]
 
-        # Handle API Response
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("success"):
-                detections = data.get("data", {}).get("results", [])
-                detected_classes = [obj["name"] for obj in detections]
-
-                if detected_classes:
-                    return "✅ Detected objects:\n" + "\n".join(set(detected_classes))
-                else:
-                    return "✅ No violations detected."
-            else:
-                return f"❌ Ultralytics API Error: {data.get('message', 'Unknown error')}", 500
+        if detected:
+            detected_str = "\n".join(set(detected))
+            return f"✅ Detected objects:\n{detected_str}"
         else:
-            return f"❌ HTTP Error {response.status_code}: {response.text}", 500
-
+            return "✅ No violations detected."
     except Exception as e:
-        return f"❌ Internal Server Error: {e}", 500
+        print("[ERROR]", e)
+        return f"❌ Error: {e}"
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT") or 8080)
-app.run(host='0.0.0.0', port=port, debug=False)
-
+    app.run(debug=True)

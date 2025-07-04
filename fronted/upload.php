@@ -7,8 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     $uploadPath = 'uploads/' . $fileName;
 
     if (move_uploaded_file($fileTmp, $uploadPath)) {
-        // ✅ Change this URL to local Flask server
-        $apiUrl = 'http://127.0.0.1:8080/detect';  // or use your local IP
+        $apiUrl = 'http://127.0.0.1:5000/detect';  // Local Flask server
 
         $cfile = new CURLFile($uploadPath);
         $postData = ['file' => $cfile];
@@ -22,17 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         $response = curl_exec($ch);
 
         if (curl_errno($ch)) {
-            $error_msg = curl_error($ch);
-            $result = "❌ cURL Error: $error_msg";
-        } elseif (!$response) {
-            $result = "⚠️ No response received from Flask server.";
+            $result = "❌ cURL Error: " . curl_error($ch);
         } else {
             $result = $response;
         }
 
         curl_close($ch);
     } else {
-        $result = "❌ Failed to upload file.";
+        $result = "❌ Failed to move uploaded file.";
     }
 } else {
     $result = "❗ No file uploaded.";
