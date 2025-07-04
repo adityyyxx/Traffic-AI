@@ -1,16 +1,23 @@
-FROM php:8.2-apache
+# Use slim Python image
+FROM python:3.10-slim
 
-# Change Apache to listen on port 8080
-RUN sed -i 's/80/8080/g' /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default.conf
+# Prevent interactive prompts during install
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Enable mod_rewrite (optional, only if you use .htaccess rewrites)
-RUN a2enmod rewrite
+# Create app directory
+WORKDIR /app
 
-# Copy frontend files to Apache web root
-COPY . /var/www/html/
+# Copy all project files
+COPY . /app
 
-# Expose port 8080
+# Install required Python packages
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Make sure 'uploads' folder exists
+RUN mkdir -p uploads
+
+# Expose port for Render (Render sets PORT env var)
 EXPOSE 8080
 
-# Start Apache in foreground
-CMD ["apache2-foreground"]
+# Start the Flask app
+CMD ["python", "detect.py"]
