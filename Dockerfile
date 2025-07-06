@@ -10,10 +10,10 @@ RUN apt-get update && \
 COPY ./backend/requirements.txt /app/requirements.txt
 RUN pip3 install --break-system-packages -r /app/requirements.txt
 
-# ✅ Download YOLOv8n model (optional if not auto-downloading)
-RUN mkdir -p /root/.cache/ultralytics && \
-    wget https://github.com/ultralytics/assets/releases/download/v8.0.0/yolov8n.pt \
-    -O /root/.cache/ultralytics/yolov8n.pt
+# # ✅ Download YOLOv8n model (optional if not auto-downloading)
+# RUN mkdir -p /root/.cache/ultralytics && \
+#     wget https://github.com/ultralytics/assets/releases/download/v8.0.0/yolov8n.pt \
+#     -O /root/.cache/ultralytics/yolov8n.pt
 
 # ✅ Copy PHP frontend
 COPY ./fronted/ /var/www/html/
