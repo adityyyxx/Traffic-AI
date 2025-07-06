@@ -34,4 +34,4 @@ def detect():
 
 if __name__ == '__main__':
     # ✅ Proper host/port setup for Render
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=8080)
