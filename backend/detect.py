@@ -8,11 +8,11 @@ model = YOLO("yolov8n.pt")
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-@app.route('/detect', methods=['POST'])  # ✅ no changes to this line required
+@app.route('/detect', methods=['POST'])
 def detect():
     try:
         file = request.files['file']
-        filename = os.path.basename(file.filename)  # ✅ This ensures no path included
+        filename = os.path.basename(file.filename)
         filepath = os.path.join(UPLOAD_FOLDER, filename)
 
         file.save(filepath)
@@ -33,4 +33,5 @@ def detect():
         return f"❌ Error: {e}"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # ✅ Proper host/port setup for Render
+    app.run(host="0.0.0.0", port=5000)
